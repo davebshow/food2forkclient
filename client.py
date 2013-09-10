@@ -3,16 +3,13 @@ import json
 import urllib
 import urllib2
 
-def exception_handler(fn):
+def error_handler(fn):
     def wrapper(self, *args, **kwargs):
         try:
             response = fn(self, *args, **kwargs)
-
         except urllib2.HTTPError, e:
-            message = u'{0}: {1} - Check API key'.format(
-                e.code, 
-                e.reason
-            )
+            message = u'{0}: {1} - Check API key'.format(e.code, 
+                                                         e.reason)
             raise F2FError(message)
         if response.code != 200:
             raise F2Error('Problem with API')
