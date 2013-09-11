@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
+import httplib
 import urllib
 import urllib2
-
+# COULD USE REQUESTS MODULE
 import config
 
 """
