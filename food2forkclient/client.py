@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import socket
 try:
     import httplib
 except ImportError:
@@ -12,7 +13,6 @@ except ImportError:
 
 import config
 
-
 API_KEY = getattr(config, 'API_KEY', None)
 
 
@@ -23,12 +23,18 @@ def error_handler(fn):
         """
         try:
             response = fn(self, *args, **kwargs)
+        except socket.timeout, e:
+            raise Food2ForkClientError('Connection Timeout', str(e))
         except urllib2.HTTPError, e:
             message = u'HTTPError - {0}:{1}'.format(e.code, e.reason)
             raise Food2ForkClientError(message)
         except urllib2.URLError, e:
-            message = u'URLError - {0}'.format(e.reason)
-            raise Food2ForkClientError(message)
+            if isinstance(e.reason, socket.timeout):
+                raise Food2ForkClientError('Connection timeout: '
+                                           + str(e.reason))
+            else:
+                message = u'URLError - {0}'.format(e.reason)
+                raise Food2ForkClientError(message)
         except httplib.HTTPException:
             raise Food2ForkClientError('HTTPException')
         except Exception:
@@ -89,7 +95,7 @@ class Food2ForkClient(object):
         req = urllib2.Request(url)
         for key, value in self.HEADERS.items():
             req.add_header(key, value)
-        response = urllib2.urlopen(req)
+        response = urllib2.urlopen(req, timeout=0.01)
         return response
 
     def _parse_json(self, response):
