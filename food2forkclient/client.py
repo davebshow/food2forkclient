@@ -8,7 +8,6 @@ pagination option(num results) max 30 ?????
 maybe add METADATA or other response methods
 """
 
-
 def error_handler(fn):
     def request_wrapper(self, *args, **kwargs):
         """
