@@ -46,7 +46,7 @@ class Food2ForkClient(object):
         query_string = urllib.urlencode(query_params)
         self.url = self.URL_SEARCH + query_string
         response = self.connect()
-        return self.parse(response)
+        return self.parse_json(response)
 
     def get_recipe(self, rid):
         """
@@ -56,7 +56,7 @@ class Food2ForkClient(object):
         query_string = urllib.urlencode(query_params)
         self.url = self.URL_GET + query_string
         response = self.connect()
-        return self.parse(response)
+        return self.parse_json(response)
 
     @error_handler
     def connect(self):
@@ -66,8 +66,8 @@ class Food2ForkClient(object):
         response = urllib2.urlopen(req)
         return response
 
-    def parse(self, response):
-        response_headers = response.info().headers
+    def parse_json(self, response):
+        response_headers = json.loads(response.info().headers)
         python_response = json.loads(response.read())
         return response_headers, python_response
 
