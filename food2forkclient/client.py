@@ -9,7 +9,7 @@ import urllib
 try:
     import urllib2
 except ImportError:
-    pass
+    import urllib as urllib2
 
 # COULD USE REQUESTS MODULE
 import config
