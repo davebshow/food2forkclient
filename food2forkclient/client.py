@@ -93,6 +93,5 @@ class Food2ForkClient(object):
         return response
 
     def _parse_json(self, response):
-        response_headers = response.info().headers
         python_response = json.loads(response.read())
-        return response_headers, python_response
+        return python_response
