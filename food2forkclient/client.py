@@ -3,15 +3,10 @@ import json
 import urllib
 import urllib2
 
-import config
-
 """
 pagination option(num results) max 30 ?????
 maybe add METADATA or other response methods
 """
-
-### get api key from config
-secret = getattr(config, api_key, None)
 
 def error_handler(fn):
     def request_wrapper(self, *args, **kwargs):
@@ -47,11 +42,8 @@ class Food2ForkClient(object):
     HEADERS = {"Content-Type":"application/json"}
 
     def __init__(self, api_key=None):
-        if secret is not None:
-            self.api_key = secret
-        else:
-            self.api_key = api_key
-        assert(api_key is not None), "Config not found. Must pass api_key"
+        self.api_key = api_key
+        assert(api_key is not None), "Must pass api_key"
 
     def search(self,**kwargs):
         """
