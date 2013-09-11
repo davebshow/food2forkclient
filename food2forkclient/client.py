@@ -8,16 +8,16 @@ def error_handler(fn):
         try:
             response = fn(self, *args, **kwargs)
         except urllib2.HTTPError, e:
-            message = u'HTTPError {0}:{1}'.format(e.code, e.reason)
+            message = u'HTTPError - {0}:{1}'.format(e.code, e.reason)
             raise Food2ForkClientError(message)
         except urllib2.URLError, e:
-            message = u'URLError: {0}'.format(e.reason)
+            message = u'URLError - {0}'.format(e.reason)
             raise Food2ForkClientError(message)
         except httplib.HTTPException:
             raise Food2ForkClientError('HTTPException')
         except Exception:
             import traceback
-            message = u'Exception: {0}'.format(traceback.format_exc())
+            message = u'Exception - {0}'.format(traceback.format_exc())
             raise Food2ForkClientError(message)
         if response.code != 200:
             raise Food2ForkClientError('Problem with Food2Fork API')
