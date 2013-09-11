@@ -10,13 +10,13 @@ def error_handler(fn):
         except urllib2.HTTPError, e:
             message = u'{0}: {1} - Check API key'.format(e.code, 
                                                          e.reason)
-            raise F2FError(message)
+            raise Food2ForkError(message)
         if response.code != 200:
-            raise F2Error('Problem with API')
+            raise Food2ForkError('Problem with API')
         return response
     return wrapper
 
-class F2FError(Exception):
+class Food2ForkError(Exception):
     pass
 
 class Food2ForkClient(object):
@@ -54,7 +54,7 @@ class Food2ForkClient(object):
         response = self.connect()
         return self.parse(response)
 
-    @exception_handler
+    @error_handler
     def connect(self):
         req = urllib2.Request(self.url)
         for key, value in self.HEADERS.items():
@@ -66,4 +66,5 @@ class Food2ForkClient(object):
         response_headers = response.info().headers
         python_response = json.loads(response.read())
         return response_headers, python_response
+
 
