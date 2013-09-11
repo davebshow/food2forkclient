@@ -2,7 +2,6 @@ from setuptools import setup
 
 setup(
     name                = 'food2forkclient',
-    version             = open('VERSION').read(),
     description         = 'Python package for Food2Fork API http://food2fork.com/api',
     long_description    = open('README.md').read(),
     author              = 'David Michael Brown',
