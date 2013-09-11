@@ -66,7 +66,7 @@ class Food2ForkClient(object):
         count: number of results per search
         """
         query_params = [
-            (key, value) for key, value in kwargs.items()
+            ('q', q), ('page', page), ('sort', sort), ('count', count)
         ]
         query_params.append(('key', self.api_key))
         query_string = urllib.urlencode(query_params)
