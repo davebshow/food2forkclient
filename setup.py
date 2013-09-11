@@ -9,7 +9,7 @@ setup(
     author_email        = 'davidmichaelbrown1@gmail.com',
     url                 = 'https://github.com/davidmichaelbrown/food2forkclient',
     packages            = [ 'food2forkclient', 'food2fork_tests' ],
-    install_requires    = open( 'requirements.txt' ).read().split(),
+    #install_requires    = open( 'requirements.txt' ).read().split(),
     keywords            = 'food2fork recipes',
     license             = 'MIT',
     classifiers         = [
