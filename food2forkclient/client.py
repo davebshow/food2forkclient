@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-#### Compatible imports for python 3
 try:
     import httplib
 except ImportError:
@@ -11,14 +10,11 @@ try:
 except ImportError:
     import urllib as urllib2
 
-# COULD USE REQUESTS MODULE
 import config
 
-"""
-pagination option(num results) max 30 ?????
-maybe add METADATA or other response methods
-"""
+
 API_KEY = getattr(config, 'API_KEY', None)
+
 
 def error_handler(fn):
     def request_wrapper(self, *args, **kwargs):
@@ -44,29 +40,34 @@ def error_handler(fn):
         return response
     return request_wrapper
 
+
 class Food2ForkClientError(Exception):
     pass
+
 
 class Food2ForkClient(object):
     URL_API = 'http://food2fork.com/api'
     URL_SEARCH = URL_API + '/search/?'
     URL_GET = URL_API + '/get/?'
-    HEADERS = {"Content-Type":"application/json"}
+    HEADERS = {"Content-Type": "application/json"}
 
     def __init__(self, api_key=API_KEY):
         self.api_key = api_key
-        assert(api_key is not None), "Must pass api_key, or create config.py with 'API_KEY'='my_api_key'"
+        msg = ("Must pass api_key, or create "
+               "config.py with 'API_KEY'='my_api_key'")
+        assert(api_key is not None), msg
 
-    def search(self,**kwargs):
+    def search(self, q=None, page=1, sort=None, count=30, **kwargs):
         """
         kwargs:
         q: search_query
         sort: how respones are sorted
         page: used to get additional results
+        count: number of results per search
         """
         query_params = [
             (key, value) for key, value in kwargs.items()
-        ] 
+        ]
         query_params.append(('key', self.api_key))
         query_string = urllib.urlencode(query_params)
         url = self.URL_SEARCH + query_string
@@ -95,7 +96,3 @@ class Food2ForkClient(object):
         response_headers = response.info().headers
         python_response = json.loads(response.read())
         return response_headers, python_response
-
-
-
-
