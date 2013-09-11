@@ -30,7 +30,7 @@ def error_handler(fn):
         if response.code != 200:
             raise Food2ForkClientError('Problem with Food2Fork API')
         return response
-    return requestion_wrapper
+    return request_wrapper
 
 class Food2ForkClientError(Exception):
     pass
@@ -80,7 +80,7 @@ class Food2ForkClient(object):
         return response
 
     def _parse_json(self, response):
-        response_headers = json.loads(response.info().headers)
+        response_headers = response.info().headers
         python_response = json.loads(response.read())
         return response_headers, python_response
 
