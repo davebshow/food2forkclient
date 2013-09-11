@@ -57,8 +57,8 @@ class Food2ForkClient(object):
         ] 
         query_params.append(('key', self.api_key))
         query_string = urllib.urlencode(query_params)
-        self.url = self.URL_SEARCH + query_string
-        response = self._request()
+        url = self.URL_SEARCH + query_string
+        response = self._request(url)
         return self._parse_json(response)
 
     def get_recipe(self, rid):
@@ -67,13 +67,13 @@ class Food2ForkClient(object):
         """
         query_params = [('key', self.api_key), ('rId', rid)]
         query_string = urllib.urlencode(query_params)
-        self.url = self.URL_GET + query_string
-        response = self._request()
+        url = self.URL_GET + query_string
+        response = self._request(url)
         return self._parse_json(response)
 
     @error_handler
-    def _request(self):
-        req = urllib2.Request(self.url)
+    def _request(self, url):
+        req = urllib2.Request(url)
         for key, value in self.HEADERS.items():
             req.add_header(key, value)
         response = urllib2.urlopen(req)
