@@ -9,10 +9,9 @@ import config
 pagination option(num results) max 30 ?????
 maybe add METADATA or other response methods
 """
+
 ### get api key from config
-
 secret = getattr(config, api_key, None)
-
 
 def error_handler(fn):
     def request_wrapper(self, *args, **kwargs):
