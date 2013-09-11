@@ -3,8 +3,17 @@ import json
 import urllib
 import urllib2
 
+"""
+pagination option(num results) max 30 ?????
+maybe add METADATA or other response methods
+"""
+
+
 def error_handler(fn):
     def request_wrapper(self, *args, **kwargs):
+        """
+        add repeat requests for timeout
+        """
         try:
             response = fn(self, *args, **kwargs)
         except urllib2.HTTPError, e:
@@ -49,8 +58,8 @@ class Food2ForkClient(object):
         query_params.append(('key', self.api_key))
         query_string = urllib.urlencode(query_params)
         self.url = self.URL_SEARCH + query_string
-        response = self.request()
-        return self.parse_json(response)
+        response = self._request()
+        return self._parse_json(response)
 
     def get_recipe(self, rid):
         """
@@ -59,20 +68,22 @@ class Food2ForkClient(object):
         query_params = [('key', self.api_key), ('rId', rid)]
         query_string = urllib.urlencode(query_params)
         self.url = self.URL_GET + query_string
-        response = self.request()
-        return self.parse_json(response)
+        response = self._request()
+        return self._parse_json(response)
 
     @error_handler
-    def request(self):
+    def _request(self):
         req = urllib2.Request(self.url)
         for key, value in self.HEADERS.items():
             req.add_header(key, value)
         response = urllib2.urlopen(req)
         return response
 
-    def parse_json(self, response):
+    def _parse_json(self, response):
         response_headers = json.loads(response.info().headers)
         python_response = json.loads(response.read())
         return response_headers, python_response
+
+
 
 
