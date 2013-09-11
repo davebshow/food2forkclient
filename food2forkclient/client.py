@@ -8,15 +8,19 @@ def error_handler(fn):
         try:
             response = fn(self, *args, **kwargs)
         except urllib2.HTTPError, e:
-            message = u'{0}: {1} - Check API key'.format(e.code, 
-                                                         e.reason)
-            raise Food2ForkError(message)
+            message = u'HTTPError {0}:{1}'.format(e.code, e.reason)
+            raise Food2ForkClientError(message)
+        except urllib2.URLError, e:
+            message = u'URLError: {0}'.format(e.reason)
+            raise Food2ForkClientError(message)
+        except httplib.HTTPException, e:
+            raise Food2ForkClientError('HTTPException')
         if response.code != 200:
-            raise Food2ForkError('Problem with API')
+            raise Food2ForkClientError('Problem with Food2Fork API')
         return response
     return wrapper
 
-class Food2ForkError(Exception):
+class Food2ForkClientError(Exception):
     pass
 
 class Food2ForkClient(object):
