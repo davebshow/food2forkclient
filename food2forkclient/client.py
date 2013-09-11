@@ -69,7 +69,7 @@ class Food2ForkClient(object):
         response = self._request(url)
         return self._parse_json(response)
 
-    def get_recipe(self, rid):
+    def get(self, rid):
         """
         rid: rId (recipe_id) of recipe returned by search query
         """
