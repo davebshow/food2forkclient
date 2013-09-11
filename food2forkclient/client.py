@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
-import httplib
+#### Compatible imports for python 3
+try:
+    import httplib
+except ImportError:
+    import http.client as httplib
 import urllib
-import urllib2
+try:
+    import urllib2
+except ImportError:
+    pass
+
 # COULD USE REQUESTS MODULE
 import config
 
