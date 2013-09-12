@@ -41,8 +41,6 @@ def error_handler(fn):
             raise Food2ForkClientError(msg)
         if response.code != 200:
             raise Food2ForkClientError('Problem with Food2Fork API')
-        #elif isinstance(response, urllib.addinfourl):
-            #raise Food2ForkClientError('Daily API calls exceded')
         return response
     return request_wrapper
 
