@@ -85,7 +85,7 @@ class Food2ForkClient(object):
                "config.py with 'API_KEY'='my_api_key'")
         assert(api_key is not None), msg
 
-    def search(self, q=None, page=1, sort=None, count=30, **kwargs):
+    def search(self, q=None, page=1, sort=None, count=30):
         """
         kwargs:
         q: search_query
