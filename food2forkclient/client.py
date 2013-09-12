@@ -2,6 +2,7 @@
 import json
 import os
 import socket
+import sys
 try:
     import httplib
 except ImportError:
@@ -21,8 +22,8 @@ try:
     API_KEY = os.environ['API_KEY']
 except KeyError:
     API_KEY = None
-    print('Please set os.environ["API_KEY"] = yourapikey, '
-          'or pass api_key param in Food2ForkClient')
+    sys.stderr.write('Please set os.environ["API_KEY"] = yourapikey, '
+                     'or pass api_key param in Food2ForkClient')
 
 
 def error_handler(fn):
@@ -114,8 +115,8 @@ class Food2ForkClient(object):
     def __init__(self, api_key=API_KEY, timeout=None):
         self.api_key = api_key
         self.timeout = timeout
-        msg = ("Must pass api_key, or create "
-               "config.py with 'API_KEY'='my_api_key'")
+        msg = ('Must pass api_key, or set '
+               'os.environ["API_KEY"] = yourapikey')
         assert(api_key is not None), msg
 
     def search(self, q=None, page=1, sort=None, count=30):
