@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import os
 import socket
 try:
     import httplib
@@ -10,10 +11,18 @@ try:
     import urllib2
 except ImportError:
     import urllib as urllib2
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse
 
-import config
 
-API_KEY = getattr(config, 'API_KEY', None)
+try:
+    API_KEY = os.environ['API_KEY']
+except KeyError:
+    API_KEY = None
+    print('Please set os.environ["API_KEY"] = yourapikey, '
+          'or pass api_key param in Food2ForkClient')
 
 
 def error_handler(fn):
@@ -33,7 +42,7 @@ def error_handler(fn):
                 msg = u'URLError - {0}'.format(e.reason)
                 raise Food2ForkClientError(msg)
         except httplib.HTTPException:
-            raise Food2ForkClientError('HTTPException')
+            raise Food2ForkHTTPException('HTTPException')
         except Exception:
             import traceback
             msg = u'Exception - {0}'.format(traceback.format_exc())
@@ -44,7 +53,31 @@ def error_handler(fn):
     return request_wrapper
 
 
+def user_error_handler(fn):
+    def response_wrapper(self, response):
+        python_response = fn(self, response)
+        parsed_url = urlparse.urlparse(response.url)
+        path = parsed_url.path
+        error = python_response.get('error', '')
+        if error:
+            raise Food2ForkClientError('API call limit exceded')
+        elif path == '/api/search/':
+            results = python_response.get('recipes', '')
+            if not results:
+                raise Food2ForkClientError('Page # does not exist')
+        elif path == '/api/get/':
+            results = python_response.get('recipe', '')
+            if not results:
+                raise Food2ForkClientError('Recipe id does not exist')
+        return results
+    return response_wrapper
+
+
 class Food2ForkClientError(Exception):
+    pass
+
+
+class Food2ForkHTTPException(Exception):
     pass
 
 
@@ -53,9 +86,9 @@ class Food2ForkHTTPError(Exception):
     def __init__(self, value):
         error = value
         if error.code == 403:
-            self.value = u'403 ?Check API key?'
+            self.value = u'403 Check API key?'
         elif error.code == 500:
-            self.value = u'500 ?Invalid search params?'
+            self.value = u'500 Invalid search params?'
         else:
             self.value = u'{0} {1}'.format(error.code, error.reason)
 
@@ -78,7 +111,7 @@ class Food2ForkClient(object):
     URL_GET = URL_API + '/get/?'
     HEADERS = {"Content-Type": "application/json"}
 
-    def __init__(self, api_key=API_KEY, timeout=10):
+    def __init__(self, api_key=API_KEY, timeout=None):
         self.api_key = api_key
         self.timeout = timeout
         msg = ("Must pass api_key, or create "
@@ -124,11 +157,9 @@ class Food2ForkClient(object):
         response = urllib2.urlopen(req, timeout=self.timeout)
         return response
 
+    @user_error_handler
     def _parse_json(self, response):
         python_response = json.loads(response.read())
-        error = python_response.get('error', None)
-        if error == 'limit':
-            raise Food2ForkClientError('API call limit exceded')
         return python_response
 
 #### 403 FORRBIDEN - bad key
