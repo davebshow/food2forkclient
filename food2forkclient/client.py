@@ -23,26 +23,26 @@ def error_handler(fn):
         """
         try:
             response = fn(self, *args, **kwargs)
-        except socket.timeout, e:
-            raise Food2ForkClientError('Connection Timeout', str(e))
         except urllib2.HTTPError, e:
-            message = u'HTTPError - {0}:{1}'.format(e.code, e.reason)
-            raise Food2ForkClientError(message)
+            msg = u'HTTPError - {0}:{1}'.format(e.code, e.reason)
+            raise Food2ForkClientError(msg)
         except urllib2.URLError, e:
             if isinstance(e.reason, socket.timeout):
-                raise Food2ForkClientError('Connection timeout: '
-                                           + str(e.reason))
+                msg = u'SocketError - {0}'.format(e.reason)
+                raise Food2ForkClientError(msg)
             else:
-                message = u'URLError - {0}'.format(e.reason)
-                raise Food2ForkClientError(message)
+                msg = u'URLError - {0}'.format(e.reason)
+                raise Food2ForkClientError(msg)
         except httplib.HTTPException:
             raise Food2ForkClientError('HTTPException')
         except Exception:
             import traceback
-            message = u'Exception - {0}'.format(traceback.format_exc())
-            raise Food2ForkClientError(message)
+            msg = u'Exception - {0}'.format(traceback.format_exc())
+            raise Food2ForkClientError(msg)
         if response.code != 200:
             raise Food2ForkClientError('Problem with Food2Fork API')
+        #elif isinstance(response, urllib.addinfourl):
+            #raise Food2ForkClientError('Daily API calls exceded')
         return response
     return request_wrapper
 
@@ -57,8 +57,9 @@ class Food2ForkClient(object):
     URL_GET = URL_API + '/get/?'
     HEADERS = {"Content-Type": "application/json"}
 
-    def __init__(self, api_key=API_KEY):
+    def __init__(self, api_key=API_KEY, timeout=10):
         self.api_key = api_key
+        self.timeout = timeout
         msg = ("Must pass api_key, or create "
                "config.py with 'API_KEY'='my_api_key'")
         assert(api_key is not None), msg
@@ -95,9 +96,16 @@ class Food2ForkClient(object):
         req = urllib2.Request(url)
         for key, value in self.HEADERS.items():
             req.add_header(key, value)
-        response = urllib2.urlopen(req, timeout=0.01)
+        response = urllib2.urlopen(req, timeout=self.timeout)
         return response
 
     def _parse_json(self, response):
         python_response = json.loads(response.read())
+        error = python_response.get('error', None)
+        if error == 'limit':
+            raise Food2ForkClientError('API call limit exceded')
         return python_response
+
+#### 403 FORRBIDEN - bad key
+#### 500 Internal Server Error page or count = None
+####  {u'error': u'limit'}
