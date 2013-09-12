@@ -93,7 +93,7 @@ class Food2ForkClient(object):
         page: used to get additional results
         count: number of results per search
         """
-        assert(count <= 30), '30 results per call maximum'
+        assert(0 < count <= 30), 'max 30 results per call, min 1'
         query_params = [
             ('q', q),
             ('page', page),
