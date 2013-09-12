@@ -24,12 +24,11 @@ def error_handler(fn):
         try:
             response = fn(self, *args, **kwargs)
         except urllib2.HTTPError, e:
-            msg = u'HTTPError - {0}:{1}'.format(e.code, e.reason)
-            raise Food2ForkClientError(msg)
+            raise Food2ForkHTTPError(e)
         except urllib2.URLError, e:
             if isinstance(e.reason, socket.timeout):
-                msg = u'SocketError - {0}'.format(e.reason)
-                raise Food2ForkClientError(msg)
+                msg = u'{0}'.format(e.reason)
+                raise Food2ForkSocketError(msg)
             else:
                 msg = u'URLError - {0}'.format(e.reason)
                 raise Food2ForkClientError(msg)
@@ -47,6 +46,30 @@ def error_handler(fn):
 
 class Food2ForkClientError(Exception):
     pass
+
+
+class Food2ForkHTTPError(Exception):
+
+    def __init__(self, value):
+        error = value
+        if error.code == 403:
+            self.value = u'403 ?Check API key?'
+        elif error.code == 500:
+            self.value = u'500 ?Invalid search params?'
+        else:
+            self.value = u'{0} {1}'.format(error.code, error.reason)
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class Food2ForkSocketError(Exception):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class Food2ForkClient(object):
