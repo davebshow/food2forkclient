@@ -93,8 +93,12 @@ class Food2ForkClient(object):
         page: used to get additional results
         count: number of results per search
         """
+        assert(count <= 30), '30 results per call maximum'
         query_params = [
-            ('q', q), ('page', page), ('sort', sort), ('count', count)
+            ('q', q),
+            ('page', page),
+            ('sort', sort),
+            ('count', count)
         ]
         query_params.append(('key', self.api_key))
         query_string = urllib.urlencode(query_params)
