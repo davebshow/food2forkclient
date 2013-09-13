@@ -41,15 +41,15 @@ def error_handler(fn):
                 raise Food2ForkSocketError(msg)
             else:
                 msg = u'URLError - {0}'.format(e.reason)
-                raise Food2ForkClientError(msg)
+                raise Food2ForkClientException(msg)
         except httplib.HTTPException:
             raise Food2ForkHTTPException('HTTPException')
         except Exception:
             import traceback
             msg = u'Exception - {0}'.format(traceback.format_exc())
-            raise Food2ForkClientError(msg)
+            raise Food2ForkClientException(msg)
         if response.code != 200:
-            raise Food2ForkClientError('Problem with Food2Fork API')
+            raise Food2ForkClientException('Problem with Food2Fork API')
         return response
     return request_wrapper
 
@@ -61,20 +61,20 @@ def user_error_handler(fn):
         path = parsed_url.path
         error = python_response.get('error', '')
         if error:
-            raise Food2ForkClientError('API call limit exceded')
+            raise Food2ForkClientException('API call limit exceded')
         elif path == '/api/search/':
             results = python_response.get('recipes', '')
             if not results:
-                raise Food2ForkClientError('Page # does not exist')
+                raise Food2ForkClientException('Page # does not exist')
         elif path == '/api/get/':
             results = python_response.get('recipe', '')
             if not results:
-                raise Food2ForkClientError('Recipe id does not exist')
+                raise Food2ForkClientException('Recipe id does not exist')
         return results
     return response_wrapper
 
 
-class Food2ForkClientError(Exception):
+class Food2ForkClientException(Exception):
     pass
 
 
