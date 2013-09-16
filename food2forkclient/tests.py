@@ -4,7 +4,10 @@ import sys
 import unittest
 
 
-from client import Food2ForkClient, Food2ForkHTTPError, Food2ForkSocketError
+from client import (
+    Food2ForkClient, Food2ForkHTTPError,
+    Food2ForkSocketError, Food2ForkClientException
+)
 
 try:
     API_KEY = os.environ['API_KEY']
@@ -19,7 +22,6 @@ class TestFood2ForkClient(unittest.TestCase):
     def setUp(self):
         self.f2fclient = Food2ForkClient(api_key=API_KEY)
 
-    # url tests
     def test_api_url(self):
         self.assertEqual(
             self.f2fclient.URL_API, 'http://food2fork.com/api'
@@ -51,16 +53,25 @@ class TestFood2ForkClient(unittest.TestCase):
             len(response) > 0
         )
 
-    def test_get(self):
-        #not sure about this, what if they delete
-        response = self.f2fclient.get(rid='47692')
-        self.assertTrue(len(response) > 0)
-
     def test_search_params(self):
         with self.assertRaises(Food2ForkHTTPError) as cm:
-            self.f2fclient.search(page=999999999999999999999999999999999)
+            self.f2fclient.search(page='asdfasdfas')
         e = cm.exception
         self.assertEqual(e.code, 500)
+
+    def test_page_number(self):
+        self.assertRaises(
+            Food2ForkClientException,
+            self.f2fclient.search,
+            page=99999999999999
+        )
+
+    def test_get(self):
+        self.assertRaises(
+            Food2ForkClientException,
+            self.f2fclient.get,
+            'asdfasdfjl;sndhdre  qwerqwasdf332323232'
+            )
 
 
 class TestFood2ForkAPIKeyError(unittest.TestCase):
