@@ -1,17 +1,8 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
 import unittest
 
 
 from client import Food2ForkClient
-
-try:
-    API_KEY = os.environ['API_KEY']
-except KeyError:
-    API_KEY = None
-    sys.stderr.write('Please set os.environ["API_KEY"] = yourapikey, '
-                     'or pass api_key param in Food2ForkClient')
 
 
 class TestFood2ForkClient(unittest.TestCase):
