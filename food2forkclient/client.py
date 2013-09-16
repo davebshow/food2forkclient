@@ -34,22 +34,22 @@ def error_handler(fn):
         try:
             response = fn(self, *args, **kwargs)
         except urllib2.HTTPError, e:
-            raise F2FHTTPError(e)
+            raise Food2ForkHTTPError(e)
         except urllib2.URLError, e:
             if isinstance(e.reason, socket.timeout):
                 msg = u'{0}'.format(e.reason)
-                raise F2FSocketError(msg)
+                raise Food2ForkSocketError(msg)
             else:
                 msg = u'URLError - {0}'.format(e.reason)
-                raise F2FClientError(msg)
+                raise Food2ForkClientException(msg)
         except httplib.HTTPException:
-            raise F2FHTTPException('HTTPException')
+            raise Food2ForkHTTPException('HTTPException')
         except Exception:
             import traceback
             msg = u'Exception - {0}'.format(traceback.format_exc())
-            raise F2FClientError(msg)
+            raise Food2ForkClientException(msg)
         if response.code != 200:
-            raise F2FClientError('Problem with Food2Fork API')
+            raise Food2ForkClientException('Problem with Food2Fork API')
         return response
     return request_wrapper
 
@@ -61,35 +61,35 @@ def user_error_handler(fn):
         path = parsed_url.path
         error = python_response.get('error', '')
         if error:
-            raise F2FClientError('API call limit exceded')
+            raise Food2ForkClientException('API call limit exceded')
         elif path == '/api/search/':
             results = python_response.get('recipes', '')
             if not results:
-                raise F2FClientError('Page # does not exist')
+                raise Food2ForkClientException('Page # does not exist')
         elif path == '/api/get/':
             results = python_response.get('recipe', '')
             if not results:
-                raise F2FClientError('Recipe id does not exist')
+                raise Food2ForkClientException('Recipe id does not exist')
         return results
     return response_wrapper
 
 
-class F2FClientError(Exception):
+class Food2ForkClientException(Exception):
     pass
 
 
-class F2FHTTPException(Exception):
+class Food2ForkHTTPException(Exception):
     pass
 
 
-class F2FHTTPError(Exception):
+class Food2ForkHTTPError(Exception):
 
     def __init__(self, value):
         error = value
         if error.code == 403:
-            self.value = u'403 Check API key'
+            self.value = u'403 Check API key?'
         elif error.code == 500:
-            self.value = u'500 Invalid search params'
+            self.value = u'500 Invalid search params?'
         else:
             self.value = u'{0} {1}'.format(error.code, error.reason)
 
@@ -97,7 +97,7 @@ class F2FHTTPError(Exception):
         return repr(self.value)
 
 
-class F2FSocketError(Exception):
+class Food2ForkSocketError(Exception):
 
     def __init__(self, value):
         self.value = value
