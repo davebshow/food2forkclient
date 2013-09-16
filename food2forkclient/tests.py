@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
+import os
+import sys
 import unittest
 
-import config
+
 from client import Food2ForkClient
 
-API_KEY = getattr(config, 'API_KEY', None)
+try:
+    API_KEY = os.environ['API_KEY']
+except KeyError:
+    API_KEY = None
+    sys.stderr.write('Please set os.environ["API_KEY"] = yourapikey, '
+                     'or pass api_key param in Food2ForkClient')
 
 
 class TestFood2ForkClient(unittest.TestCase):
@@ -28,19 +35,20 @@ class TestFood2ForkClient(unittest.TestCase):
     def test_search(self):
         response = self.f2fclient.search()
         self.assertTrue(
-            len(response) == 30
+            len(response) > 0
         )
 
     def test_query_search(self):
         response = self.f2fclient.search(q='chicken')
         self.assertTrue(
             len(response) > 0
+
         )
 
     def test_get(self):
         #not sure about this, what if they delete
         response = self.f2fclient.get(rid='47692')
-        self.assertTrue(len(response) > 1)
+        self.assertTrue(len(response) > 0)
 
 
 if __name__ == '__main__':
