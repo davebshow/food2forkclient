@@ -33,7 +33,7 @@ def error_handler(fn):
         """
         try:
             response = fn(self, *args, **kwargs)
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             raise Food2ForkHTTPError(e)
         except urllib2.URLError, e:
             if isinstance(e.reason, socket.timeout):
