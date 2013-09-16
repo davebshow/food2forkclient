@@ -37,16 +37,16 @@ def error_handler(fn):
             raise Food2ForkHTTPError(e)
         except urllib2.URLError as e:
             if isinstance(e.reason, socket.timeout):
-                msg = u'{0}'.format(e.reason)
+                msg = '{0}'.format(e.reason)
                 raise Food2ForkSocketError(msg)
             else:
-                msg = u'URLError - {0}'.format(e.reason)
+                msg = 'URLError - {0}'.format(e.reason)
                 raise Food2ForkClientException(msg)
         except httplib.HTTPException:
             raise Food2ForkHTTPException('HTTPException')
         except Exception:
             import traceback
-            msg = u'Exception - {0}'.format(traceback.format_exc())
+            msg = 'Exception - {0}'.format(traceback.format_exc())
             raise Food2ForkClientException(msg)
         if response.code != 200:
             raise Food2ForkClientException('Problem with Food2Fork API')
@@ -87,11 +87,11 @@ class Food2ForkHTTPError(Exception):
     def __init__(self, value):
         error = value
         if error.code == 403:
-            self.value = u'403 Check API key?'
+            self.value = '403 Check API key?'
         elif error.code == 500:
-            self.value = u'500 Invalid search params?'
+            self.value = '500 Invalid search params?'
         else:
-            self.value = u'{0} {1}'.format(error.code, error.reason)
+            self.value = '{0} {1}'.format(error.code, error.reason)
 
     def __str__(self):
         return repr(self.value)
@@ -119,21 +119,20 @@ class Food2ForkClient(object):
                'os.environ["API_KEY"] = yourapikey')
         assert(api_key is not None), msg
 
-    def search(self, q=None, page=1, sort=None, count=30):
+    def search(self, q=None, page=1, count=30):
         """
         kwargs:
         q: search_query
-        sort: how respones are sorted
         page: used to get additional results
         count: number of results per search
         """
         assert(0 < count <= 30), 'max 30 results per call, min 1'
         query_params = [
-            ('q', q),
             ('page', page),
-            ('sort', sort),
             ('count', count)
         ]
+        if q is not None:
+            query_params.append(('q', q))
         query_params.append(('key', self.api_key))
         query_string = urllib.urlencode(query_params)
         url = self.URL_SEARCH + query_string
