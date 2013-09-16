@@ -7,15 +7,22 @@ try:
     import httplib
 except ImportError:
     import http.client as httplib
-import urllib
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
+try:
+    from urllib2 import HTTPError, URLError
+except ImportError:
+    from urllib.error import HTTPError, URLError
 try:
     import urllib2
 except ImportError:
-    import urllib as urllib2
+    import urllib.request as urllib2
 try:
     import urlparse
 except ImportError:
-    import urllib.parse
+    import urllib.parse as urlparse
 
 
 try:
@@ -33,9 +40,9 @@ def error_handler(fn):
         """
         try:
             response = fn(self, *args, **kwargs)
-        except urllib2.HTTPError as e:
+        except HTTPError as e:
             raise Food2ForkHTTPError(e)
-        except urllib2.URLError as e:
+        except URLError as e:
             if isinstance(e.reason, socket.timeout):
                 msg = '{0}'.format(e.reason)
                 raise Food2ForkSocketError(msg)
@@ -87,8 +94,10 @@ class Food2ForkHTTPError(Exception):
     def __init__(self, value):
         error = value
         if error.code == 403:
-            self.value = '403 Check API key?'
+            self.code = 403
+            self.value = '403 Check API key'
         elif error.code == 500:
+            self.code = 500
             self.value = '500 Invalid search params?'
         else:
             self.value = '{0} {1}'.format(error.code, error.reason)
@@ -134,7 +143,7 @@ class Food2ForkClient(object):
         if q is not None:
             query_params.append(('q', q))
         query_params.append(('key', self.api_key))
-        query_string = urllib.urlencode(query_params)
+        query_string = urlencode(query_params)
         url = self.URL_SEARCH + query_string
         response = self._request(url)
         return self._parse_json(response)
@@ -144,7 +153,7 @@ class Food2ForkClient(object):
         rid: rId (recipe_id) of recipe returned by search query
         """
         query_params = [('key', self.api_key), ('rId', rid)]
-        query_string = urllib.urlencode(query_params)
+        query_string = urlencode(query_params)
         url = self.URL_GET + query_string
         response = self._request(url)
         return self._parse_json(response)

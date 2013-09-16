@@ -4,7 +4,7 @@ import sys
 import unittest
 
 
-from client import Food2ForkClient
+from client import Food2ForkClient, Food2ForkHTTPError, Food2ForkSocketError
 
 try:
     API_KEY = os.environ['API_KEY']
@@ -19,6 +19,7 @@ class TestFood2ForkClient(unittest.TestCase):
     def setUp(self):
         self.f2fclient = Food2ForkClient(api_key=API_KEY)
 
+    # url tests
     def test_api_url(self):
         self.assertEqual(
             self.f2fclient.URL_API, 'http://food2fork.com/api'
@@ -35,20 +36,55 @@ class TestFood2ForkClient(unittest.TestCase):
     def test_search(self):
         response = self.f2fclient.search()
         self.assertTrue(
-            len(response) > 0
+            len(response) == 30
         )
 
-    def test_query_search(self):
+    def test_search_count(self):
+        response = self.f2fclient.search(count=10)
+        self.assertTrue(
+            len(response) == 10
+        )
+
+    def test_search_query(self):
         response = self.f2fclient.search(q='chicken')
         self.assertTrue(
             len(response) > 0
-
         )
 
     def test_get(self):
         #not sure about this, what if they delete
         response = self.f2fclient.get(rid='47692')
         self.assertTrue(len(response) > 0)
+
+    def test_search_params(self):
+        with self.assertRaises(Food2ForkHTTPError) as cm:
+            self.f2fclient.search(page=999999999999999999999999999999999)
+        e = cm.exception
+        self.assertEqual(e.code, 500)
+
+
+class TestFood2ForkAPIKeyError(unittest.TestCase):
+
+    def setUp(self):
+        self.f2fclient = Food2ForkClient(api_key='aaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
+    def test_api_key_error(self):
+        with self.assertRaises(Food2ForkHTTPError) as cm:
+            self.f2fclient.search()
+        e = cm.exception
+        self.assertEqual(e.code, 403)
+
+
+class TestFood2ForkTimeoutError(unittest.TestCase):
+
+    def setUp(self):
+        self.f2fclient = Food2ForkClient(api_key=API_KEY, timeout=0.000000001)
+
+    def test_timeout_error(self):
+        with self.assertRaises(Food2ForkSocketError) as cm:
+            self.f2fclient.search()
+        e = cm.exception
+        self.assertTrue(isinstance(e, Food2ForkSocketError))
 
 
 if __name__ == '__main__':
