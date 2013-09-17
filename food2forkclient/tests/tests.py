@@ -4,7 +4,7 @@ import sys
 import unittest
 
 
-from client import (
+from food2forkclient.client import (
     Food2ForkClient, Food2ForkHTTPError,
     Food2ForkSocketError, Food2ForkClientException
 )
@@ -67,6 +67,10 @@ class TestFood2ForkClient(unittest.TestCase):
         )
 
     def test_get(self):
+        response = self.f2fclient.get('26851')
+        self.assertTrue(len(response) == 1)
+
+    def test_get_error(self):
         self.assertRaises(
             Food2ForkClientException,
             self.f2fclient.get,
