@@ -68,7 +68,7 @@ class TestFood2ForkClient(unittest.TestCase):
 
     def test_get(self):
         response = self.f2fclient.get('26851')
-        self.assertTrue(len(response) == 1)
+        self.assertTrue(len(response) > 1)
 
     def test_get_error(self):
         self.assertRaises(
