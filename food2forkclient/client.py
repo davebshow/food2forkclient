@@ -168,7 +168,8 @@ class Food2ForkClient(object):
 
     @user_error_handler
     def _parse_json(self, response):
-        python_response = json.loads(response.read())
+        #encoding = response.headers.get_content_charset()
+        python_response = json.loads(response.read().decode('utf-8'))
         return python_response
 
 #### 403 FORRBIDEN - bad key
