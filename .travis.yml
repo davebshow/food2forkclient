@@ -3,7 +3,7 @@ python:
 - '2.7'
 - '3.2'
 - '3.3'
-script: python food2forkclient/tests.py
+script: python food2forkclient/tests/tests.py
 env:
   global:
     secure: CoDNRRh8NMfZp9P0eQS7QdElIOSrRo/7/wbmdnx/ziFD9hprwE3AyqaHy3uDuUkdgAukM3fT66+TwzoAIUCyhEsdRCBhIEIEgPL865UoaCob0L66CvhZnV/UmCvuxDQ9Meb3yZQSYGIlcr6ql1eH49Sjf555JPQDsGvHoqXP6uA=
