@@ -4,7 +4,7 @@ import sys
 import unittest
 
 
-from ..client import (
+from client import (
     Food2ForkClient, Food2ForkHTTPError,
     Food2ForkSocketError, Food2ForkClientException
 )
