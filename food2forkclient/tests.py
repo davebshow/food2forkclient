@@ -80,11 +80,10 @@ class TestFood2ForkAPIKeyError(unittest.TestCase):
         self.f2fclient = Food2ForkClient(api_key='aaaaaaaaaaaaaaaaaaaaaaaaaaa')
 
     def test_api_key_error(self):
-        self.assertRaises(
-            Food2ForkHTTPError,
-            self.f2fclient.search,
-            page=1
-        )
+        with self.assertRaises(Food2ForkHTTPError) as cm:
+            self.f2fclient.search()
+        e = cm.exception
+        self.assertEqual(e.code, 403)
 
 
 class TestFood2ForkTimeoutError(unittest.TestCase):
@@ -93,11 +92,10 @@ class TestFood2ForkTimeoutError(unittest.TestCase):
         self.f2fclient = Food2ForkClient(api_key=API_KEY, timeout=0.000000001)
 
     def test_timeout_error(self):
-        self.assertRaises(
-            Food2ForkSocketError,
-            self.f2fclient.search,
-            page=1
-        )
+        with self.assertRaises(Food2ForkSocketError) as cm:
+            self.f2fclient.search()
+        e = cm.exception
+        self.assertTrue(isinstance(e, Food2ForkSocketError))
 
 
 if __name__ == '__main__':
